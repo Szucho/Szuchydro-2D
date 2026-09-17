@@ -26,7 +26,7 @@
 */
 
 
-void validateBC(const GridBC& bc) { //If periodic, the other wall needs to be set to periodic BC aswell
+void validateBC(const GridBC& bc){ //If periodic, the other wall needs to be set to periodic BC aswell
     if ((bc.left.type == BCType::Periodic) != (bc.right.type == BCType::Periodic))
         throw std::invalid_argument("Periodic BC must be applied to both left and right walls");
     if ((bc.bottom.type == BCType::Periodic) != (bc.top.type == BCType::Periodic))
@@ -37,97 +37,79 @@ void validateBC(const GridBC& bc) { //If periodic, the other wall needs to be se
 
 
 
-void applyBC(Grid& grid, const GridBC& bc) {
-  validateBC(bc); //check if Periodic BC was used correctly
-  size_t Nx = grid.rows() - 4; //ghost points not included
-  size_t Ny = grid.cols() - 4;
-  //every wall has a BC -> switch case for every wall depending on BCType
-  //then just apply the BC at the walls
-
-  //left wall
-  for (size_t j = 0; j < grid.cols(); ++j) {
-    switch (bc.left.type) {
-      case BCType::Open:{
-        grid.copyCell(0,j, 2,j);
-        grid.copyCell(1,j, 2,j);
-        break;
+namespace {
+ 
+//apply one BCType along the i (x1) direction at a single physical wall.
+//"is_left" picks which wall; ghost layers run for g = 0..nghost-1.
+void applyWallX(Grid& grid, const BoundaryCondition& bc,
+                 size_t is, size_t ie, size_t js, size_t je, size_t nghost,
+                 bool is_left){
+  for (size_t j = js - nghost; j <= je + nghost; ++j) {
+    for (size_t g = 0; g < nghost; ++g) {
+      size_t ghost_i  = is_left ? (is - 1 - g) : (ie + 1 + g);
+      switch (bc.type) {
+        case BCType::Open:
+          grid.copyCell(ghost_i, j, is_left ? is : ie, j);
+          break;
+        case BCType::Closed: {
+          size_t mirror_i = is_left ? (is + g) : (ie - g);
+          grid.copyCell(ghost_i, j, mirror_i, j);
+          grid(ghost_i, j, 1) *= -1.0; //flip normal momentum rho*u
+          break;
+        }
+        case BCType::Dirichlet:
+          grid.setCell(ghost_i, j, bc.Q_fixed);
+          break;
+        case BCType::Periodic:
+          throw std::logic_error(
+            "applyBC: wall marked Periodic but has no Mesh neighbor -- "
+            "set MeshInputs::periodic_x1/periodic_x2 so Mesh wires this "
+            "edge to its neighbor instead of calling applyBC on it.");
       }
-      case BCType::Closed:
-        grid.copyCell(1,j, 2,j); grid(1,j,1) *=-1.0; //flip normal momentum rho*u
-        grid.copyCell(0,j, 3,j); grid(0,j,1) *=-1.0;
-        break;
-      case BCType::Periodic:
-        grid.copyCell(0,j, Nx,  j); //goes out this side enters at the other side
-        grid.copyCell(1,j, Nx+1,j);
-        break;
-      case BCType::Dirichlet:
-        grid.setCell(0,j, bc.left.Q_fixed); //const BC value
-        grid.setCell(1,j, bc.left.Q_fixed);
-        break;
     }
   }
-  //right wall
-  for (size_t j = 0; j < grid.cols(); ++j) {
-    switch (bc.right.type) {
-      case BCType::Open:{
-        grid.copyCell(Nx+2, j, Nx+1, j);
-        grid.copyCell(Nx+3, j, Nx+1, j);
-        break;
+}
+ 
+//same as above but along the j (x2) direction; flips the v-momentum (index 2).
+void applyWallY(Grid& grid, const BoundaryCondition& bc,
+                 size_t is, size_t ie, size_t js, size_t je, size_t nghost,
+                 bool is_bottom){
+  for (size_t i = is - nghost; i <= ie + nghost; ++i) {
+    for (size_t g = 0; g < nghost; ++g) {
+      size_t ghost_j = is_bottom ? (js - 1 - g) : (je + 1 + g);
+      switch (bc.type) {
+        case BCType::Open:
+          grid.copyCell(i, ghost_j, i, is_bottom ? js : je);
+          break;
+        case BCType::Closed: {
+          size_t mirror_j = is_bottom ? (js + g) : (je - g);
+          grid.copyCell(i, ghost_j, i, mirror_j);
+          grid(i, ghost_j, 2) *= -1.0; //flip normal momentum rho*v
+          break;
+        }
+        case BCType::Dirichlet:
+          grid.setCell(i, ghost_j, bc.Q_fixed);
+          break;
+        case BCType::Periodic:
+          throw std::logic_error(
+            "applyBC: wall marked Periodic but has no Mesh neighbor -- "
+            "set MeshInputs::periodic_x1/periodic_x2 so Mesh wires this "
+            "edge to its neighbor instead of calling applyBC on it.");
       }
-      case BCType::Closed:
-        grid.copyCell(Nx+2,j, Nx+1,j); grid(Nx+2,j,1) *= -1.0;
-        grid.copyCell(Nx+3,j, Nx,  j); grid(Nx+3,j,1) *= -1.0;
-        break;
-      case BCType::Periodic:
-        grid.copyCell(Nx+2,j, 2,j);
-        grid.copyCell(Nx+3,j, 3,j);
-        break;
-      case BCType::Dirichlet:
-        grid.setCell(Nx+2,j, bc.right.Q_fixed);
-        grid.setCell(Nx+3,j, bc.right.Q_fixed);
-        break;
     }
   }
-  //bottom wall
-  for (size_t i = 0; i < grid.rows(); ++i) {
-    switch (bc.bottom.type) {
-      case BCType::Open:
-        grid.copyCell(i,0, i,2);
-        grid.copyCell(i,1, i,2);
-        break;
-      case BCType::Closed:
-        grid.copyCell(i,1, i,2); grid(i,1,2) *= -1.0;
-        grid.copyCell(i,0, i,3); grid(i,0,2) *= -1.0;
-        break;
-      case BCType::Periodic:
-        grid.copyCell(i,0, i,Ny);
-        grid.copyCell(i,1, i,Ny+1);
-        break;
-      case BCType::Dirichlet:
-        grid.setCell(i,0, bc.bottom.Q_fixed);
-        grid.setCell(i,1, bc.bottom.Q_fixed);
-        break;
-    }
-  }
-  //top wall
-  for (size_t i = 0; i < grid.rows(); ++i) {
-    switch (bc.top.type) {
-      case BCType::Open:
-        grid.copyCell(i,Ny+2, i,Ny+1);
-        grid.copyCell(i,Ny+3, i,Ny+1);
-        break;
-      case BCType::Closed:
-        grid.copyCell(i,Ny+2, i,Ny+1); grid(i,Ny+2,2) *= -1.0;
-        grid.copyCell(i,Ny+3, i,Ny  ); grid(i,Ny+3,2) *= -1.0;
-        break;
-      case BCType::Periodic:
-        grid.copyCell(i,Ny+2, i,2);
-        grid.copyCell(i,Ny+3, i,3);
-        break;
-      case BCType::Dirichlet:
-        grid.setCell(i,Ny+2, bc.top.Q_fixed);
-        grid.setCell(i,Ny+3, bc.top.Q_fixed);
-        break;
-    }
-  }
+}
+ 
+} //namespace
+ 
+ 
+void applyBC(Grid& grid, const GridBC& bc,
+             size_t is, size_t ie, size_t js, size_t je, size_t nghost,
+             bool bnd_left, bool bnd_right, bool bnd_bottom, bool bnd_top){
+  validateBC(bc); //check if Periodic BC was requested consistently in the param file
+ 
+  if (bnd_left)   applyWallX(grid, bc.left,   is, ie, js, je, nghost, /*is_left=*/true);
+  if (bnd_right)  applyWallX(grid, bc.right,  is, ie, js, je, nghost, /*is_left=*/false);
+  if (bnd_bottom) applyWallY(grid, bc.bottom, is, ie, js, je, nghost, /*is_bottom=*/true);
+  if (bnd_top)    applyWallY(grid, bc.top,    is, ie, js, je, nghost, /*is_bottom=*/false);
 }

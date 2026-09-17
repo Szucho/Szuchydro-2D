@@ -1,8 +1,8 @@
 # params.txt
 
-# Grid
+# Grid (root-level: total domain cell counts before any refinement)
 Nx      500
-Ny      5
+Ny      6
 Nt      100
 t0      0.0
 tf      0.2
@@ -10,6 +10,16 @@ xmin    -1.0
 xmax    1.0
 ymin    -3.0
 ymax    3.0
+
+# Mesh decomposition OPTIONAL. Must evenly divide Nx/Ny however
+# Omit both to get the old behaviour: one MeshBlock spanning the whole domain
+nx1_block   100
+nx2_block   6
+
+# Static refinement OPTIONAL, zero or more lines.
+# refine x1min x1max x2min x2max level
+# Refines every root block overlapping this box up to level (0 = root).
+refine -0.1 0.1 -3.0 3.0 1
 
 # Physics
 gamma   1.4

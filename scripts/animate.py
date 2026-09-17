@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
-
 SAVE_OUTPUTS = True
 FPS = 30
+
 
 
 def read_meta(outdir):
@@ -20,20 +20,86 @@ def read_meta(outdir):
                 meta[parts[0]] = float(parts[1])
     return meta
 
+
 def read_grid(path):
-    frames = []
+    """Returns (blocks, frames).
+    blocks: list of dicts, one per MeshBlock, in order
+      {level, lx1, lx2, x1min, x1max, x2min, x2max, nx1, nx2}
+    frames: list of (t, block_arrays), block_arrays[k] has shape
+      (blocks[k]['nx1'], blocks[k]['nx2'], 4)
+    that block's own active state vector, same (i,j) order the sim used."""
     with open(path, 'rb') as f:
-        nx = np.frombuffer(f.read(8), dtype=np.uint64)[0]
-        ny = np.frombuffer(f.read(8), dtype=np.uint64)[0]
+        nblocks = int(np.frombuffer(f.read(8), dtype=np.uint64)[0])
+        blocks = []
+        for _ in range(nblocks):
+            level = int(np.frombuffer(f.read(4), dtype=np.int32)[0])
+            lx1, lx2 = np.frombuffer(f.read(16), dtype=np.int64)
+            x1min, x1max, x2min, x2max = np.frombuffer(f.read(32), dtype=np.float64)
+            nx1, nx2 = np.frombuffer(f.read(16), dtype=np.uint64)
+            blocks.append(dict(level=level, lx1=int(lx1), lx2=int(lx2),
+                                x1min=x1min, x1max=x1max, x2min=x2min, x2max=x2max,
+                                nx1=int(nx1), nx2=int(nx2)))
+
+        frames = []
         while True:
             tbuf = f.read(8)
             if not tbuf: break
             t = np.frombuffer(tbuf, dtype=np.float64)[0]
-            raw = f.read(int(nx * ny * 4 * 8))
-            if len(raw) != nx * ny * 4 * 8: break
-            data = np.frombuffer(raw, dtype=np.float64).reshape(nx, ny, 4)
-            frames.append((t, data))
-    return frames
+            block_arrays = []
+            complete = True
+            for blk in blocks:
+                n = blk['nx1'] * blk['nx2'] * 4
+                raw = f.read(n * 8)
+                if len(raw) != n * 8:
+                    complete = False
+                    break
+                block_arrays.append(np.frombuffer(raw, dtype=np.float64).reshape(blk['nx1'], blk['nx2'], 4))
+            if not complete: break
+            frames.append((t, block_arrays))
+    return blocks, frames
+
+
+def build_canvas_layout(blocks):
+    """
+    THIS SOLUTION MIGHT NOT BE THE BEST!!!
+    Work out a single finest-resolution grid every block's data can be
+    pasted into. Returns (nx_c, ny_c, placements) where placements[k] is
+    (i0, i1, j0, j1, upsample_i, upsample_j) for blocks[k] the pixel
+    range it occupies on the canvas, and how much to repeat its own
+    cells by along each axis to fill that range."""
+    maxlevel = max(b['level'] for b in blocks)
+    #my reasoning here:
+    #every block has the same active cell count per axis by construction
+    #(MeshInputs::nx1_block/nx2_block), so the canvas size is just that
+    #times the number of level-0 blocks needed to tile the domain, times
+    #the finest refinement factor
+    nx1_block = blocks[0]['nx1']
+    nx2_block = blocks[0]['nx2']
+    #infer root block-grid dimensions from the level-0 blocks' lx1/lx2 span
+    lvl0 = [b for b in blocks if b['level'] == 0]
+    nblk1_root = max(b['lx1'] for b in lvl0) + 1
+    nblk2_root = max(b['lx2'] for b in lvl0) + 1
+
+    nx_c = nblk1_root * nx1_block * (1 << maxlevel)
+    ny_c = nblk2_root * nx2_block * (1 << maxlevel)
+
+    placements = []
+    for b in blocks:
+        factor = 1 << (maxlevel - b['level'])
+        i0 = b['lx1'] * nx1_block * factor
+        j0 = b['lx2'] * nx2_block * factor
+        i1 = i0 + nx1_block * factor
+        j1 = j0 + nx2_block * factor
+        placements.append((i0, i1, j0, j1, factor, factor))
+    return nx_c, ny_c, placements
+
+
+def stitch_frame(block_arrays, placements, nx_c, ny_c):
+    canvas = np.empty((nx_c, ny_c, 4))
+    for data, (i0, i1, j0, j1, fi, fj) in zip(block_arrays, placements):
+        canvas[i0:i1, j0:j1, :] = np.repeat(np.repeat(data, fi, axis=0), fj, axis=1)
+    return canvas
+
 
 def compute_primitives(data, gamma=1.4):
     rho = data[:, :, 0]
@@ -43,30 +109,40 @@ def compute_primitives(data, gamma=1.4):
     p   = (gamma - 1.0) * (E - 0.5 * rho * (u**2 + v**2))
     return rho, u, v, p
 
+
 outdir = input("Output directory: ").strip()
 meta = read_meta(outdir)
 
 xmin, xmax = meta['xmin'], meta['xmax']
 ymin, ymax = meta['ymin'], meta['ymax']
-nx, ny     = int(meta['Nx']), int(meta['Ny'])
 gamma      = meta['gamma']
 
-frames = read_grid(os.path.join(outdir, "grid.bin"))
+blocks, frames = read_grid(os.path.join(outdir, "grid.bin"))
 if not frames:
     raise RuntimeError("grid.bin is empty or could not be read")
 
-times = [f[0] for f in frames]
-prims = [compute_primitives(f[1], gamma) for f in frames]
+maxlevel = max(b['level'] for b in blocks)
+if len(blocks) > 1 or maxlevel > 0:
+    print(f"grid.bin: {len(blocks)} block(s), refinement up to level {maxlevel}\\"
+          f"stitching onto a single canvas for plotting (coarser blocks are "
+          f"nearest-neighbor upsampled, not interpolated; this is a display "
+          f"convenience, not a claim about solution accuracy there. PROPER PLOT IDEA NEEDED.).")
 
-#physical Cell-Center coordinates
-dx = (xmax - xmin) / nx
-x_centers = xmin + (np.arange(nx) + 0.5) * dx
-j_mid = ny // 2
-y_mid_val = ymin + (j_mid + 0.5) * ((ymax - ymin) / ny)
+nx_c, ny_c, placements = build_canvas_layout(blocks)
+
+times = [f[0] for f in frames]
+prims = [compute_primitives(stitch_frame(f[1], placements, nx_c, ny_c), gamma) for f in frames]
+
+#physical cell-center coordinates on the canvas
+dx = (xmax - xmin) / nx_c
+dy = (ymax - ymin) / ny_c
+x_centers = xmin + (np.arange(nx_c) + 0.5) * dx
+j_mid = ny_c // 2
+y_mid_val = ymin + (j_mid + 0.5) * dy
 
 #meshgrid boundaries for 2D pcolormesh
-x_edges = np.linspace(xmin, xmax, nx + 1)
-y_edges = np.linspace(ymin, ymax, ny + 1)
+x_edges = np.linspace(xmin, xmax, nx_c + 1)
+y_edges = np.linspace(ymin, ymax, ny_c + 1)
 X, Y = np.meshgrid(x_edges, y_edges)
 
 #1D slice animation

@@ -1,0 +1,3 @@
+C:/Users/szuch/cpp_coding/Szuchydro-2D/build/CMakeFiles/szuchydro2d.dir
+C:/Users/szuch/cpp_coding/Szuchydro-2D/build/CMakeFiles/edit_cache.dir
+C:/Users/szuch/cpp_coding/Szuchydro-2D/build/CMakeFiles/rebuild_cache.dir
