@@ -321,6 +321,7 @@ int main(int argc, char*argv[]){
     writeFrame(gridfile, mesh, t);
     gridfile.flush();
     draw_progress(tf, true); //final draw
+    std::cout << std::endl;
     std::cout << "Simulation finished successfully at t = " << t << std::endl;
  
   } catch (const std::invalid_argument& e){
