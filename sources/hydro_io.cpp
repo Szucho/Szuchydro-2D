@@ -3,7 +3,9 @@
 /*
  * Here we handle input output
  *
- *
+ * parameter file parsing, boundary condition mapping, 
+ * initial state setup via Kokkos device kernels,
+ * simulation metadata logging, and binary grid/frame serialization.
 */
 
 SimParams readParams(const std::string& filename){ //reads in params.txt

@@ -2,6 +2,16 @@
 #include <stdexcept>
 #include <algorithm>
 
+
+/*
+ * Mesh logic and SMR/AMR implementation
+ *
+ * manages block allocations, quadtree initialization, neighbor mapping,
+ * Kokkos device memory views, ghost zone exchanges, and conservative refluxing
+*/
+
+//validates domain and block dimensions, computes root block layouts,
+//and allocates flat, multi-buffered Kokkos device views for state data and face fluxes
 Mesh::Mesh(const MeshInputs& in) : in_(in){
   if(in_.nx1_block <= 0 || in_.nx2_block <= 0)
     throw std::invalid_argument("Mesh: block size must be positive");
@@ -26,12 +36,14 @@ Mesh::Mesh(const MeshInputs& in) : in_(in){
   host_neighbor_gid_   = Kokkos::create_mirror_view(neighbor_gid_);
   host_neighbor_level_ = Kokkos::create_mirror_view(neighbor_level_);
 
+  //additional bookkeeping views for second finer-neighbor slots and block parity
   neighbor_gid2_ = IntView2D("neighbor_gid2", in_.max_blocks, 4);
   block_parity_  = IntView2D("block_parity",  in_.max_blocks, 2);
   host_neighbor_gid2_ = Kokkos::create_mirror_view(neighbor_gid2_);
   host_block_parity_  = Kokkos::create_mirror_view(block_parity_);
 }
 
+//computes physical coordinate boundaries and cell counts for a specific quadtree node location
 RegionSize Mesh::BlockSizeFromLocation(const LogicalLocation& loc) const {
   Real dom_w1 = in_.domain.x1max - in_.domain.x1min;
   Real dom_w2 = in_.domain.x2max - in_.domain.x2min;
@@ -48,6 +60,7 @@ RegionSize Mesh::BlockSizeFromLocation(const LogicalLocation& loc) const {
   return sz;
 }
 
+//constructs root block trees and applies static refinement criteria across defined regions
 void Mesh::BuildTree(){
   roots_.clear();
   roots_.reserve((size_t)nx1_blocks_root_*(size_t)nx2_blocks_root_);
@@ -67,17 +80,19 @@ void Mesh::BuildTree(){
 }
 
 
+//initializes an individual mesh block, setting up ghost zone offsets and physical boundary flags
 MeshBlock::MeshBlock(int gid_, int slot_id_, LogicalLocation loc_, RegionSize size_, int nghost_)
   : gid(gid_), slot_id(slot_id_), loc(loc_), block_size(size_), nghost(nghost_) {
   is = nghost;
   ie = nghost + block_size.nx1 - 1;
   js = nghost;
   je = nghost + block_size.nx2 - 1;
-  for (int i = 0; i < 4; ++i) {
-      is_physical_boundary[i] = true;
+  for(int i = 0; i < 4; ++i){
+    is_physical_boundary[i] = true;
   }
 }
 
+//collects leaf nodes from the quadtree and allocates active computational mesh blocks
 void Mesh::CreateMeshBlocks(){
   std::vector<LogicalLocation> leaves;
   for(auto& root : roots_) root->CollectLeaves(leaves);
@@ -109,6 +124,7 @@ bool Overlap(const IndexRange& a, const IndexRange& b){
 }
 } // namespace
 
+//establishes topological neighbor relationships between blocks across multi-level AMR boundaries
 void Mesh::SetupNeighbors(){
   for(auto& bptr : blocks_){
     MeshBlock& b = *bptr;
@@ -182,6 +198,7 @@ void Mesh::SetupNeighbors(){
 }
 
 //changed meshblock sync logic uses gid2 for bookkeeping
+//synchronizes host neighbor topology maps, secondary finer slots, and parity flags down to Kokkos device views.
 void Mesh::SyncNeighborTablesDevice(){
   for(size_t b = 0; b < blocks_.size(); ++b){
     host_block_parity_(b, 0) = (int)(blocks_[b]->loc.lx1 & 1);
@@ -226,6 +243,7 @@ Real MeshBlock::x2v(int j) const {
   return block_size.x2min + (j - js + 0.5) * dx2();
 }
 
+//parallel Kokkos kernel executing ghost zone data exchanges across Same, Coarser, and Finer block boundaries
 void ExchangeGhostZones(Mesh& mesh){
   int n_active = mesh.num_active_blocks();
   if (n_active == 0) return;
@@ -257,6 +275,7 @@ void ExchangeGhostZones(Mesh& mesh){
       if(t >= N) return;
 
       if(lvl == static_cast<int>(NeighborLevel::Same)){
+        //direct copy for matching resolution neighbors
         if(face == FaceDir::XP){
           for(int g = 0; g < nghost; ++g)
             for(size_t k = 0; k < NVAR; ++k) data(a_slot, ie + 1 + g, js + t, k) = data(b_slot, is + g, js + t, k);
@@ -272,6 +291,7 @@ void ExchangeGhostZones(Mesh& mesh){
         }
       } 
       else if(lvl == static_cast<int>(NeighborLevel::Coarser)){
+        //linear interpolation prolongation from coarser neighbor grids
         int half_N = N/2;
         int half = xface ? parity(a_slot, 1) : parity(a_slot, 0);
         int tk = half*half_N + t/2;
@@ -303,6 +323,7 @@ void ExchangeGhostZones(Mesh& mesh){
         }
       } 
       else if(lvl == static_cast<int>(NeighborLevel::Finer)){
+        //averaging restriction from finer neighbor blocks
         int half_N = N/2;
         int half = t/half_N;
         int local_t = t%half_N;
@@ -333,7 +354,8 @@ void ExchangeGhostZones(Mesh& mesh){
   );
 }
 
-void ApplyReflux(Mesh& mesh, Real dt){ //changed
+//applies conservative refluxing corrections across fine-coarse block interfaces to ensure mass/momentum conservation
+void ApplyReflux(Mesh& mesh, Real dt){
   int n_active = mesh.num_active_blocks();
   if (n_active == 0) return;
 
@@ -341,7 +363,7 @@ void ApplyReflux(Mesh& mesh, Real dt){ //changed
   View4D flux = mesh.get_flux_view();
   IntView2D n_gid = mesh.get_neighbor_gid_view();
   IntView2D n_level = mesh.get_neighbor_level_view();
-  IntView2D n_gid2 = mesh.get_neighbor_gid2_view();   // add
+  IntView2D n_gid2 = mesh.get_neighbor_gid2_view();
   IntView2D parity = mesh.get_block_parity_view();
 
   int nx1 = mesh.inputs().nx1_block;

@@ -2,6 +2,8 @@
 #include "mesh.hpp"
 #include <stdexcept>
 
+//validates that periodic boundary conditions are symmetrically paired
+//across opposing domain walls (left/right and bottom/top).
 void validateBC(const GridBC& bc){
   if((bc.left.type == BCType::Periodic) != (bc.right.type == BCType::Periodic))
     throw std::invalid_argument("Periodic BC must be applied to both left and right walls");
@@ -9,6 +11,10 @@ void validateBC(const GridBC& bc){
     throw std::invalid_argument("Periodic BC must be applied to both bottom and top walls");
 }
 
+
+//applies physical boundary conditions across all active mesh blocks that 
+//border the external domain boundaries using a Kokkos parallel kernel.
+//Supports Open, Closed (reflecting momentum), and Dirichlet BCs.
 void ApplyPhysicalBoundaryConditions(Mesh& mesh, const GridBC& bc) {
   validateBC(bc);
 

@@ -6,11 +6,22 @@
 #include <array>
 #include "hydro_config.hpp"
 
+/*
+ * Adaptive Mesh Refinement (AMR) and topology header
+ *
+ * Defines logical coordinate structures, quadtree nodes, individual mesh blocks,
+ * and the global mesh container integrated with Kokkos multi-dimensional views.
+ *
+ * Based on Athena++
+*/
+
+//identifies a block's hierarchical tree level and discrete index coordinates
 struct LogicalLocation{
   int level = 0;
   std::int64_t lx1 = 0;
   std::int64_t lx2 = 0;
 
+  //computes the parent location in the quadtree hierarchy
   LogicalLocation Parent() const {
     return LogicalLocation{level - 1, lx1 >> 1, lx2 >> 1};
   }
@@ -26,6 +37,7 @@ struct LogicalLocation{
   }
 };
 
+//defines physical coordinate bounds and cell dimensions for a grid domain or block
 struct RegionSize{
   Real x1min = 0.0, x1max = 0.0;
   Real x2min = 0.0, x2max = 0.0;
@@ -33,6 +45,7 @@ struct RegionSize{
   int nx2 = 0;
 };
 
+//bounding box descriptor used to apply static refinement regions during tree generation
 struct RefinementRegion{
   Real x1min, x1max, x2min, x2max;
   int level;
@@ -40,6 +53,7 @@ struct RefinementRegion{
 
 class Mesh;
 
+//quadtree node class managing recursive domain subdivision and leaf collection for SMR/AMR
 class MeshBlockTree{
 public:
   MeshBlockTree(Mesh* mesh, MeshBlockTree* parent, LogicalLocation loc);
@@ -60,18 +74,22 @@ private:
   Mesh* mesh_;
   MeshBlockTree* parent_;
   LogicalLocation loc_;
-  std::array<std::unique_ptr<MeshBlockTree>, 4> children_;
+  std::array<std::unique_ptr<MeshBlockTree>, 4> children_; //quadtree quadrants
 };
 
+//face direction enumerations (X-minus, X-plus, Y-minus, Y-plus)
 enum class FaceDir{ XM = 0, XP = 1, YM = 2, YP = 3 };
+//neighbor relationship levels for ghost zone exchange and refluxing consistency
 enum class NeighborLevel{ Same = 0, Coarser = 1, Finer = 2, PhysicalBoundary = 3 };
 
+//describes an adjacent block connection across a specific face boundary
 struct NeighborBlock{
   int gid;
   NeighborLevel level;
   bool periodic_wrap;
 };
 
+//represents an active computational block containing local cell data (=local grid) and physical boundaries
 class MeshBlock{
 public:
   MeshBlock(int gid_, int slot_id_, LogicalLocation loc_, RegionSize size_, int nghost_);
@@ -82,14 +100,17 @@ public:
   RegionSize block_size;
   int nghost;
 
+  //active cell index bounds (excluding ghost zones)
   int is, ie, js, je;
 
   bool is_physical_boundary[4];
   std::vector<NeighborBlock> neighbors[4];
 
+  //helper methods to calculate physical cell-centered coordinates
   Real x1v(int i) const;
   Real x2v(int j) const;
 
+  //local grid spacing calculations
   Real dx1() const { return (block_size.x1max - block_size.x1min)/block_size.nx1; }
   Real dx2() const { return (block_size.x2max - block_size.x2min)/block_size.nx2; }
 
@@ -98,6 +119,7 @@ public:
   }
 };
 
+//initialization structure holding global domain layout parameters and configuration inputs
 struct MeshInputs {
     RegionSize domain;
     int nx1_block = 0, nx2_block = 0;
@@ -107,6 +129,7 @@ struct MeshInputs {
     std::vector<RefinementRegion> refine_regions;
 };
 
+//big mesh manager handling block allocation, Kokkos device views, and inter-block communication
 class Mesh{
 public:
   explicit Mesh(const MeshInputs& in);
@@ -120,6 +143,7 @@ public:
   std::vector<std::unique_ptr<MeshBlock>>& blocks(){ return blocks_; }
   const std::vector<std::unique_ptr<MeshBlock>>& blocks() const { return blocks_; }
 
+  //Kokkos Device View accessors for solvers and kernels
   View4D get_data_view(){ return data_view_; }
   View4D get_data_next_view(){ return data_next_view_; }
   View4D get_flux_view(){ return flux_view_; }
@@ -147,9 +171,10 @@ private:
   View4D flux_view_;
   IntView2D neighbor_gid_;
   IntView2D neighbor_level_;
-  IntView2D neighbor_gid2_;      //second finer-neighbor slot, shape (max_blocks,4), -1 if unused
+  IntView2D neighbor_gid2_; //second finer-neighbor slot, shape (max_blocks,4), -1 if unused
   IntView2D block_parity_;
 
+  //host mirror tables used to sync connectivity maps down to device views
   HostIntView2D host_neighbor_gid_;
   HostIntView2D host_neighbor_level_;
   HostIntView2D host_neighbor_gid2_;

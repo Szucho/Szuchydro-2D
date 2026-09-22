@@ -19,9 +19,12 @@
  Bertalan Szuchovszky 20.04.2026
  
  Modified on 21.09.2026:
-  - Adapted to parse full params.txt and export binary grid frames directly from flat Kokkos Views.
+  - Adapted to parse full params.txt configuration files.
+  - Added support for exporting binary grid structures and simulation frames directly from flat Kokkos device views
+
 */
 
+//structure holding all simulation, grid, physics, and I/O parameters parsed from config files
 struct SimParams {
   //grid
   double Nx, Ny, Nt;
