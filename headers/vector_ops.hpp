@@ -1,0 +1,36 @@
+#pragma once
+
+#include <array>
+#include <cstddef>
+#include "hydro_config.hpp"
+
+//fixed 4D vector for Hydro state Q = [rho, rho*u, rho*v, E]
+
+//the usual vector operations that we will need
+namespace VecOps{
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 add(const Vec4& a, const Vec4& b){
+    return Vec4{a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]};
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 sub(const Vec4& a, const Vec4& b){
+    return Vec4{a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]};
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 mul(double s, const Vec4& v){
+    return Vec4{s * v[0], s * v[1], s * v[2], s * v[3]};
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 operator+(const Vec4& a, const Vec4& b){ return add(a, b); }
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 operator-(const Vec4& a, const Vec4& b){ return sub(a, b); }
+
+  KOKKOS_INLINE_FUNCTION
+  Vec4 operator*(double s, const Vec4& v){ return mul(s, v); }
+
+} // namespace VecOps

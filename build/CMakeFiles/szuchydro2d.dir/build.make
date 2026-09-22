@@ -71,35 +71,35 @@ include CMakeFiles/szuchydro2d.dir/flags.make
 CMakeFiles/szuchydro2d.dir/codegen:
 .PHONY : CMakeFiles/szuchydro2d.dir/codegen
 
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj: C:/Users/szuch/cpp_coding/Szuchydro-2D/sources/HLLC.cpp
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj: CMakeFiles/szuchydro2d.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj -MF CMakeFiles\szuchydro2d.dir\sources\HLLC.cpp.obj.d -o CMakeFiles\szuchydro2d.dir\sources\HLLC.cpp.obj -c C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\HLLC.cpp
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj: C:/Users/szuch/cpp_coding/Szuchydro-2D/sources/grid.cpp
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj: CMakeFiles/szuchydro2d.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj -MF CMakeFiles\szuchydro2d.dir\sources\grid.cpp.obj.d -o CMakeFiles\szuchydro2d.dir\sources\grid.cpp.obj -c C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid.cpp
 
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.i"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\HLLC.cpp > CMakeFiles\szuchydro2d.dir\sources\HLLC.cpp.i
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/szuchydro2d.dir/sources/grid.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid.cpp > CMakeFiles\szuchydro2d.dir\sources\grid.cpp.i
 
-CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.s"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\HLLC.cpp -o CMakeFiles\szuchydro2d.dir\sources\HLLC.cpp.s
+CMakeFiles/szuchydro2d.dir/sources/grid.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/grid.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid.cpp -o CMakeFiles\szuchydro2d.dir\sources\grid.cpp.s
 
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj: C:/Users/szuch/cpp_coding/Szuchydro-2D/sources/grid_setup.cpp
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj: CMakeFiles/szuchydro2d.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj -MF CMakeFiles\szuchydro2d.dir\sources\grid_setup.cpp.obj.d -o CMakeFiles\szuchydro2d.dir\sources\grid_setup.cpp.obj -c C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid_setup.cpp
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj: C:/Users/szuch/cpp_coding/Szuchydro-2D/sources/hydro_io.cpp
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj: CMakeFiles/szuchydro2d.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj -MF CMakeFiles\szuchydro2d.dir\sources\hydro_io.cpp.obj.d -o CMakeFiles\szuchydro2d.dir\sources\hydro_io.cpp.obj -c C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\hydro_io.cpp
 
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.i"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid_setup.cpp > CMakeFiles\szuchydro2d.dir\sources\grid_setup.cpp.i
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\hydro_io.cpp > CMakeFiles\szuchydro2d.dir\sources\hydro_io.cpp.i
 
-CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.s"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\grid_setup.cpp -o CMakeFiles\szuchydro2d.dir\sources\grid_setup.cpp.s
+CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\hydro_io.cpp -o CMakeFiles\szuchydro2d.dir\sources\hydro_io.cpp.s
 
 CMakeFiles/szuchydro2d.dir/sources/main.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
 CMakeFiles/szuchydro2d.dir/sources/main.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
@@ -146,44 +146,31 @@ CMakeFiles/szuchydro2d.dir/sources/meshtree.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/meshtree.cpp.s"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\meshtree.cpp -o CMakeFiles\szuchydro2d.dir\sources\meshtree.cpp.s
 
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj: CMakeFiles/szuchydro2d.dir/flags.make
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj: CMakeFiles/szuchydro2d.dir/includes_CXX.rsp
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj: C:/Users/szuch/cpp_coding/Szuchydro-2D/sources/slope_limiters.cpp
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj: CMakeFiles/szuchydro2d.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj -MF CMakeFiles\szuchydro2d.dir\sources\slope_limiters.cpp.obj.d -o CMakeFiles\szuchydro2d.dir\sources\slope_limiters.cpp.obj -c C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\slope_limiters.cpp
-
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.i"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\slope_limiters.cpp > CMakeFiles\szuchydro2d.dir\sources\slope_limiters.cpp.i
-
-CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.s"
-	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\szuch\cpp_coding\Szuchydro-2D\sources\slope_limiters.cpp -o CMakeFiles\szuchydro2d.dir\sources\slope_limiters.cpp.s
-
 # Object files for target szuchydro2d
 szuchydro2d_OBJECTS = \
-"CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj" \
-"CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj" \
+"CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj" \
+"CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj" \
 "CMakeFiles/szuchydro2d.dir/sources/main.cpp.obj" \
 "CMakeFiles/szuchydro2d.dir/sources/mesh.cpp.obj" \
-"CMakeFiles/szuchydro2d.dir/sources/meshtree.cpp.obj" \
-"CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj"
+"CMakeFiles/szuchydro2d.dir/sources/meshtree.cpp.obj"
 
 # External object files for target szuchydro2d
 szuchydro2d_EXTERNAL_OBJECTS =
 
-C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/HLLC.cpp.obj
-C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/grid_setup.cpp.obj
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/grid.cpp.obj
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/hydro_io.cpp.obj
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/main.cpp.obj
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/mesh.cpp.obj
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/meshtree.cpp.obj
-C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/sources/slope_limiters.cpp.obj
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/build.make
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: _deps/kokkos-build/containers/src/libkokkoscontainers.a
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: _deps/kokkos-build/algorithms/src/libkokkosalgorithms.a
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: _deps/kokkos-build/simd/src/libkokkossimd.a
+C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: _deps/kokkos-build/core/src/libkokkoscore.a
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/linkLibs.rsp
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/objects1.rsp
 C:/Users/szuch/cpp_coding/Szuchydro-2D/builds/szuchydro2d.exe: CMakeFiles/szuchydro2d.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable C:\Users\szuch\cpp_coding\Szuchydro-2D\builds\szuchydro2d.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\szuch\cpp_coding\Szuchydro-2D\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable C:\Users\szuch\cpp_coding\Szuchydro-2D\builds\szuchydro2d.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\szuchydro2d.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
